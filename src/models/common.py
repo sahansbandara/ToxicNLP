@@ -10,7 +10,7 @@ from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.metrics import confusion_matrix, roc_curve
 from src.config import (
     RANDOM_STATE, X_TFIDF_NPZ, Y_CSV, FINAL_PREPROCESSED,
-    ARTIFACTS_DIR, RESULTS_DIR
+    ARTIFACTS_DIR, RESULTS_DIR, MODELS_DIR
 )
 from src.utils.io_paths import ensure_dirs
 from src.utils.eval_utils import (
@@ -36,6 +36,7 @@ def split_data(X, y, test_size):
     )
 
 def baseline_eval(model, X_train, X_test, y_train, y_test, model_name, short_name, results_csv, no_plots=False):
+    ensure_dirs()
     model.fit(X_train, y_train)
     y_pred = model.predict(X_test)
     y_score = get_scores_for_roc(model, X_test)
@@ -54,6 +55,7 @@ def baseline_eval(model, X_train, X_test, y_train, y_test, model_name, short_nam
 
 def tune_and_eval(model_factory, param_grid, X_train, X_test, y_train, y_test,
                   model_name, short_name, results_csv, no_plots=False):
+    ensure_dirs()
     gs = GridSearchCV(model_factory(), param_grid, cv=3, n_jobs=-1)
     gs.fit(X_train, y_train)
     best = gs.best_estimator_
@@ -75,10 +77,11 @@ def tune_and_eval(model_factory, param_grid, X_train, X_test, y_train, y_test,
                            out_path=f"{RESULTS_DIR}/{short_name}_roc_tuned.png", show=True)
 
     # Save tuned model
-    os.makedirs(os.path.join(ARTIFACTS_DIR, "models"), exist_ok=True)
-    dump(best, os.path.join(ARTIFACTS_DIR, "models", f"{short_name}_tuned.joblib"))
+    os.makedirs(MODELS_DIR, exist_ok=True)
+    dump(best, os.path.join(MODELS_DIR, f"{short_name}_tuned.joblib"))
     return best
 
 def save_baseline_model(model, short_name):
-    os.makedirs(os.path.join(ARTIFACTS_DIR, "models"), exist_ok=True)
-    dump(model, os.path.join(ARTIFACTS_DIR, "models", f"{short_name}_baseline.joblib"))
+    ensure_dirs()
+    os.makedirs(MODELS_DIR, exist_ok=True)
+    dump(model, os.path.join(MODELS_DIR, f"{short_name}_baseline.joblib"))

@@ -17,7 +17,7 @@ TRAIN_CSV = "train.csv"  # Input dataset path
 # ------------------------------
 ARTIFACTS_DIR = "artifacts"
 RESULTS_DIR = "results"
-MODEL_DIR = f"{ARTIFACTS_DIR}/models"
+MODELS_DIR = f"{ARTIFACTS_DIR}/models"
 
 # ------------------------------
 # Preprocessing step files
